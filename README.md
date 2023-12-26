@@ -805,3 +805,870 @@ int main() {
 
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//part2
+
+//graph
+
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <stack>
+
+using namespace std;
+
+class Graph {
+private:
+    vector<vector<int>> adjacencyList;
+
+public:
+    Graph(int numVertices) : adjacencyList(numVertices) {}
+
+    void addEdge(int src, int dest) {
+        // Add edge from src to dest
+        adjacencyList[src].push_back(dest);
+
+        // Since the graph is undirected, add edge from dest to src as well
+        adjacencyList[dest].push_back(src);
+    }
+
+    void printGraph() {
+        for (int i = 0; i < adjacencyList.size(); ++i) {
+            cout << "Vertex " << i << " is connected to: ";
+            for (int neighbor : adjacencyList[i]) {
+                cout << neighbor << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    void bfs(int startVertex) {
+        vector<bool> visited(adjacencyList.size(), false);
+        queue<int> q;
+
+        visited[startVertex] = true;
+        q.push(startVertex);
+
+        cout << "BFS starting from vertex " << startVertex << ": ";
+        while (!q.empty()) {
+            int currentVertex = q.front();
+            q.pop();
+            cout << currentVertex << " ";
+
+            for (int neighbor : adjacencyList[currentVertex]) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    q.push(neighbor);
+                }
+            }
+        }
+        cout << endl;
+    }
+
+    void dfs(int startVertex) {
+        vector<bool> visited(adjacencyList.size(), false);
+        stack<int> s;
+
+        s.push(startVertex);
+
+        cout << "DFS starting from vertex " << startVertex << ": ";
+        while (!s.empty()) {
+            int currentVertex = s.top();
+            s.pop();
+
+            if (!visited[currentVertex]) {
+                cout << currentVertex << " ";
+                visited[currentVertex] = true;
+            }
+
+            for (int neighbor : adjacencyList[currentVertex]) {
+                if (!visited[neighbor]) {
+                    s.push(neighbor);
+                }
+            }
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    // Specify the number of vertices in the graph
+    int numVertices = 4;
+
+    Graph graph(numVertices);
+
+    // Adding edges to the graph
+    graph.addEdge(0, 1);
+    graph.addEdge(0, 2);
+    graph.addEdge(1, 2);
+    graph.addEdge(2, 0);
+    graph.addEdge(2, 3);
+    graph.addEdge(3, 3);
+
+    // Printing the graph
+    cout << "Graph representation using adjacency lists:" << endl;
+    graph.printGraph();
+
+    // Perform BFS starting from vertex 0
+    graph.bfs(0);
+
+    // Perform DFS starting from vertex 0
+    graph.dfs(0);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//hashmaps
+
+#include <iostream>
+#include <list>
+#include <utility>
+
+using namespace std;
+
+// User ADT
+struct User {
+    string firstName;
+    string lastName;
+    int birthdate;  // Represented as an integer in the format YYYYMMDD
+};
+
+// Hash table using chaining to handle collisions
+class UserHashTable {
+private:
+    static const size_t tableSize = 100;  // Adjust as needed
+    list<pair<int, User>> table[tableSize];
+
+public:
+    // Manual hash function to generate a unique hash code
+    size_t generateHash(const User& user) {
+        // Directly use birthdate as the key
+        return user.birthdate % tableSize;
+    }
+
+    // Add a new user to the hash table
+    void addUser(const User& user) {
+        size_t index = generateHash(user);
+        table[index].push_back({user.birthdate, user});
+        cout << "User added successfully.\n";
+    }
+
+    // Search for a user in the hash table
+    void searchUser(const User& user) {
+        size_t index = generateHash(user);
+        for (const auto& entry : table[index]) {
+            if (entry.second.firstName == user.firstName &&
+                entry.second.lastName == user.lastName &&
+                entry.second.birthdate == user.birthdate) {
+                cout << "User found: " << entry.second.firstName << " " << entry.second.lastName << " "
+                     << entry.second.birthdate << "\n";
+                return;
+            }
+        }
+        cout << "User not found.\n";
+    }
+
+    // Delete a user from the hash table
+    void deleteUser(const User& user) {
+        size_t index = generateHash(user);
+        table[index].remove_if([&](const auto& entry) {
+            return entry.second.firstName == user.firstName &&
+                   entry.second.lastName == user.lastName &&
+                   entry.second.birthdate == user.birthdate;
+        });
+        cout << "User deleted successfully.\n";
+    }
+};
+
+int main() {
+    UserHashTable userTable;
+
+    while (true) {
+        cout << "\nUser Identification System Menu:\n";
+        cout << "1. Add New User\n";
+        cout << "2. Search for User\n";
+        cout << "3. Delete User\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+
+        int choice;
+        cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                User newUser;
+                cout << "Enter first name: ";
+                cin >> newUser.firstName;
+                cout << "Enter last name: ";
+                cin >> newUser.lastName;
+                cout << "Enter birthdate (YYYYMMDD): ";
+                cin >> newUser.birthdate;
+                userTable.addUser(newUser);
+                break;
+            }
+            case 2: {
+                User searchUser;
+                cout << "Enter first name: ";
+                cin >> searchUser.firstName;
+                cout << "Enter last name: ";
+                cin >> searchUser.lastName;
+                cout << "Enter birthdate (YYYYMMDD): ";
+                cin >> searchUser.birthdate;
+                userTable.searchUser(searchUser);
+                break;
+            }
+            case 3: {
+                User deleteUser;
+                cout << "Enter first name: ";
+                cin >> deleteUser.firstName;
+                cout << "Enter last name: ";
+                cin >> deleteUser.lastName;
+                cout << "Enter birthdate (YYYYMMDD): ";
+                cin >> deleteUser.birthdate;
+                userTable.deleteUser(deleteUser);
+                break;
+            }
+            case 4:
+                cout << "Exiting program.\n";
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//bst
+
+#include <iostream>
+using namespace std;
+
+class node {
+public:
+    int val;
+    node* left;
+    node* right;
+
+    node(int v) {
+        val = v;
+        left = nullptr;
+        right = nullptr;
+    }
+};
+
+class bst {
+private:
+    node* root;
+
+    node* insertNode(node* root, int val) {
+        if (root == nullptr)
+            return new node(val);
+
+        if (val > root->val)
+            root->right = insertNode(root->right, val);
+        else if (val < root->val)
+            root->left = insertNode(root->left, val);
+
+        return root;
+    }
+
+    node* searchNode(node* root, int val) {
+        if (root == nullptr || root->val == val)
+            return root;
+
+        if (val < root->val)
+            return searchNode(root->left, val);
+        else
+            return searchNode(root->right, val);
+    }
+
+    node* findMin(node* root) {
+        while (root->left != nullptr) {
+            root = root->left;
+        }
+        return root;
+    }
+
+    node* deleteNode(node* root, int val) {
+        node* targetNode = searchNode(root, val);
+
+        if (targetNode == nullptr)
+            return root; // Node not found
+
+        // Proceed with deletion based on the found target node
+        if (targetNode->left == nullptr) {
+            node* temp = targetNode->right;
+            delete targetNode;
+            return temp;
+        } else if (targetNode->right == nullptr) {
+            node* temp = targetNode->left;
+            delete targetNode;
+            return temp;
+        }
+
+        // Node with two children
+        node* temp = findMin(targetNode->right);
+        targetNode->val = temp->val;
+        targetNode->right = deleteNode(targetNode->right, temp->val);
+
+        return targetNode;
+    }
+
+    void inorderTraversal(node* root) {
+        if (root != nullptr) {
+            inorderTraversal(root->left);
+            cout << root->val << ",";
+            inorderTraversal(root->right);
+        }
+    }
+
+public:
+    bst() {
+        root = nullptr;
+    }
+
+    void insert(int val) {
+        root = insertNode(root, val);
+    }
+
+    void remove(int val) {
+        root = deleteNode(root, val);
+    }
+
+    void inorder() {
+        inorderTraversal(root);
+        cout << endl;
+    }
+};
+
+int main() {
+    bst tree;
+    tree.insert(22);
+    tree.insert(6);
+    tree.insert(5);
+    tree.insert(2);
+    tree.insert(65);
+    tree.insert(32);
+    tree.insert(11);
+    tree.insert(33);
+    tree.insert(77);
+    tree.insert(4);
+    tree.insert(1);
+
+    cout << "Original tree: ";
+    tree.inorder();
+
+    tree.remove(6);
+
+    cout << "Tree after removing 6: ";
+    tree.inorder();
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//avl
+#include <iostream>
+using namespace std;
+
+class AVLNode {
+public:
+    int key;
+    int height;
+    AVLNode* left;
+    AVLNode* right;
+
+    AVLNode(int k) : key(k), height(1), left(nullptr), right(nullptr) {}
+};
+
+class AVLTree {
+private:
+    AVLNode* root;
+
+    int max(int a, int b) {
+        return (a > b) ? a : b;
+    }
+
+    int height(AVLNode* node) {
+        return (node == nullptr) ? 0 : node->height;
+    }
+
+    int getBalance(AVLNode* node) {
+        return (node == nullptr) ? 0 : height(node->left) - height(node->right);
+    }
+
+    AVLNode* rotateRight(AVLNode* y) {
+        AVLNode* x = y->left;
+        AVLNode* T2 = x->right;
+
+        x->right = y;
+        y->left = T2;
+
+        y->height = 1 + max(height(y->left), height(y->right));
+        x->height = 1 + max(height(x->left), height(x->right));
+
+        return x;
+    }
+
+    AVLNode* rotateLeft(AVLNode* x) {
+        AVLNode* y = x->right;
+        AVLNode* T2 = y->left;
+
+        y->left = x;
+        x->right = T2;
+
+        x->height = 1 + max(height(x->left), height(x->right));
+        y->height = 1 + max(height(y->left), height(y->right));
+
+        return y;
+    }
+
+    AVLNode* minValueNode(AVLNode* node) {
+        AVLNode* current = node;
+        while (current->left != nullptr) {
+            current = current->left;
+        }
+        return current;
+    }
+
+    AVLNode* deleteNode(AVLNode* root, int key) {
+        if (root == nullptr)
+            return root; // Key not found
+
+        if (key < root->key)
+            root->left = deleteNode(root->left, key);
+        else if (key > root->key)
+            root->right = deleteNode(root->right, key);
+        else {
+            // Node with the key is found
+
+            // Case 1: Node with only one child or no child
+            if (root->left == nullptr) {
+                AVLNode* temp = root->right;
+                delete root;
+                return temp;
+            } else if (root->right == nullptr) {
+                AVLNode* temp = root->left;
+                delete root;
+                return temp;
+            }
+
+            // Case 2: Node with two children
+            AVLNode* temp = minValueNode(root->right);
+            root->key = temp->key;
+            root->right = deleteNode(root->right, temp->key);
+        }
+
+        // Update height of the current node
+        root->height = 1 + max(height(root->left), height(root->right));
+
+        // Get the balance factor to check if rotation is needed
+        int balance = getBalance(root);
+
+        // Left Left Case
+        if (balance > 1 && getBalance(root->left) >= 0)
+            return rotateRight(root);
+
+        // Left Right Case
+        if (balance > 1 && getBalance(root->left) < 0) {
+            root->left = rotateLeft(root->left);
+            return rotateRight(root);
+        }
+
+        // Right Right Case
+        if (balance < -1 && getBalance(root->right) <= 0)
+            return rotateLeft(root);
+
+        // Right Left Case
+        if (balance < -1 && getBalance(root->right) > 0) {
+            root->right = rotateRight(root->right);
+            return rotateLeft(root);
+        }
+
+        return root;
+    }
+
+    void inorderTraversal(AVLNode* node) {
+        if (node != nullptr) {
+            inorderTraversal(node->left);
+            cout << node->key << " ";
+            inorderTraversal(node->right);
+        }
+    }
+
+public:
+    AVLTree() : root(nullptr) {}
+
+    void insert(int key) {
+        root = insertNode(root, key);
+    }
+
+    void remove(int key) {
+        root = deleteNode(root, key);
+    }
+
+    void inorder() {
+        inorderTraversal(root);
+        cout << endl;
+    }
+};
+
+int main() {
+    AVLTree avlTree;
+
+    avlTree.insert(10);
+    avlTree.insert(20);
+    avlTree.insert(30);
+    avlTree.insert(40);
+    avlTree.insert(50);
+    avlTree.insert(25);
+
+    cout << "Inorder traversal of AVL tree: ";
+    avlTree.inorder();
+
+    avlTree.remove(30);
+
+    cout << "AVL tree after removing 30: ";
+    avlTree.inorder();
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+//quicksort
+#include <iostream>
+
+using namespace std;
+
+void swap(int &a, int &b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];  // Choose the last element as the pivot
+    int i = low - 1;  // Index of smaller element
+
+    for (int j = low; j < high; ++j) {
+        if (arr[j] <= pivot) {
+            // Swap arr[i] and arr[j]
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+
+    // Swap arr[i + 1] and arr[high] (put the pivot in the correct position)
+    swap(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+void quicksort(int arr[], int low, int high) {
+    if (low < high) {
+        // Partition the array and get the index of the pivot element
+        int pivotIndex = partition(arr, low, high);
+
+        // Recursively sort the subarrays
+        quicksort(arr, low, pivotIndex - 1);
+        quicksort(arr, pivotIndex + 1, high);
+    }
+}
+
+int main() {
+    const int arraySize = 20;
+    int arr[arraySize] = {12, 5, 3, 17, 8, 10, 1, 19, 6, 15, 14, 7, 13, 4, 11, 18, 2, 20, 9, 16};
+
+    cout << "Original array: ";
+    for (int i = 0; i < arraySize; ++i) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+
+    quicksort(arr, 0, arraySize - 1);
+
+    cout << "Sorted array: ";
+    for (int i = 0; i < arraySize; ++i) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
+
+
+
+
+//quicksort
+
+#include <iostream>
+
+using namespace std;
+
+void merge(int arr[], int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    // Create temporary arrays
+    int leftArray[n1];
+    int rightArray[n2];
+
+    // Copy data to temporary arrays leftArray[] and rightArray[]
+    for (int i = 0; i < n1; ++i)
+        leftArray[i] = arr[left + i];
+    for (int j = 0; j < n2; ++j)
+        rightArray[j] = arr[mid + 1 + j];
+
+    // Merge the temporary arrays back into arr[left..right]
+    int i = 0; // Initial index of first subarray
+    int j = 0; // Initial index of second subarray
+    int k = left; // Initial index of merged subarray
+
+    while (i < n1 && j < n2) {
+        if (leftArray[i] <= rightArray[j]) {
+            arr[k] = leftArray[i];
+            ++i;
+        } else {
+            arr[k] = rightArray[j];
+            ++j;
+        }
+        ++k;
+    }
+
+    // Copy the remaining elements of leftArray[], if there are any
+    while (i < n1) {
+        arr[k] = leftArray[i];
+        ++i;
+        ++k;
+    }
+
+    // Copy the remaining elements of rightArray[], if there are any
+    while (j < n2) {
+        arr[k] = rightArray[j];
+        ++j;
+        ++k;
+    }
+}
+
+void mergeSort(int arr[], int left, int right) {
+    if (left < right) {
+        // Same as (left+right)/2, but avoids overflow for large left and right
+        int mid = left + (right - left) / 2;
+
+        // Sort first and second halves
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+
+        // Merge the sorted halves
+        merge(arr, left, mid, right);
+    }
+}
+
+int main() {
+    const int arraySize = 20;
+    int arr[arraySize] = {12, 5, 3, 17, 8, 10, 1, 19, 6, 15, 14, 7, 13, 4, 11, 18, 2, 20, 9, 16};
+
+    cout << "Original array: ";
+    for (int i = 0; i < arraySize; ++i) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+
+    mergeSort(arr, 0, arraySize - 1);
+
+    cout << "Sorted array: ";
+    for (int i = 0; i < arraySize; ++i) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
+
